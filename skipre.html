@@ -3,10 +3,13 @@
   <head>
     <title>Ski Free</title>
 		<style>
+			body { margin: 0px; }
 			#skier { color: red; }
+			#controls { top: 0px; position: fixed; height: 50px; background: #eee; width: 100%; border-bottom: 3px solid gray; padding: 10px; }
+#controls button { height: 40px; width: 100px; }
+			#skipre { margin: 0 auto; }
 		</style>
 <!-- 
-x
 Notes
 =====
 
@@ -48,11 +51,11 @@ http://stackoverflow.com/questions/7539216/
     
   </head>
   <body>
+	<div id="controls">
     <button id="left">Left</button>
     <button id="right">Right</button>
-    <button id="forward">Step Forward</button>
     <button id="stop">Stop</button>
-    <hr />
+	</div>
 <pre id="skipre">
 
 
