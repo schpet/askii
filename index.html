@@ -5,10 +5,11 @@
 		<style>
 			body { margin: 0px; }
 			#skier { color: red; }
-			#controls { top: 0px; position: fixed; height: 50px; background: #eee; width: 100%; border-bottom: 3px solid gray; padding: 10px; }
-#controls button { height: 40px; width: 100px; }
-			#skipre { margin: 0 auto; }
+			#controls { bottom: 0px; position: fixed; height: 50px; background: #eee; width: 100%; border-top: 3px solid gray; padding: 10px; text-align: center }
+			#controls button { height: 40px; width: 100px; }
+			#content { text-align: center; }
 		</style>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">  
 <!-- 
 Notes
 =====
@@ -54,8 +55,10 @@ http://stackoverflow.com/questions/7539216/
 	<div id="controls">
     <button id="left">Left</button>
     <button id="right">Right</button>
+    <button id="start">Start</button>
     <button id="stop">Stop</button>
 	</div>
+	<div id="content">
 <pre id="skipre">
 
 
@@ -345,7 +348,8 @@ http://stackoverflow.com/questions/7539216/
 ################################################################################
 ################################################################################
 ################################################################################
-</pre>
+	</pre>
+</div>
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="shortcut.js"></script>
@@ -461,7 +465,6 @@ http://stackoverflow.com/questions/7539216/
 					}, 1000 / fps);
 				};
 
-				game.run();
 
 
         $('#left').click(function(){
@@ -484,6 +487,9 @@ http://stackoverflow.com/questions/7539216/
 
         $('#stop').click(function(){
 					clearInterval(intervalId);
+				});
+        $('#start').click(function(){
+					game.run();
 				});
       });
     </script>
