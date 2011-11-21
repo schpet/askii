@@ -411,15 +411,15 @@ http://stackoverflow.com/questions/7539216/
           this.map = undefined;
           this.skier = undefined;
           this.hook = undefined;
+					this.delay = 50;
+					this.timeoutId = undefined;
 
           this.stepForward = function(){
             this.position++;
 						this.skier.stepForward();
-            console.log("stepped forward " );
-          }
+          };
 
           this.render = function(){
-
 
             var output = "";
 						var affectedlines = []
@@ -458,9 +458,24 @@ http://stackoverflow.com/questions/7539216/
             this.hook.html(output);
 
 						$(document).scrollTop($('#skier').position().top - 100);
-          }
+          };
 
-        }
+					this.run = function(){
+						var self = this;
+						this.timeoutId = setTimeout(function(){ 
+							self.render(); 
+							self.stepForward() 
+							self.run();
+						}, this.delay);
+					};
+
+					this.stop = function(){
+						if(this.timeoutId){
+							clearTimeout(this.timeoutId);
+						}
+					};
+        };
+
         
         var breh = new Skier();
         console.log(breh);
@@ -471,16 +486,6 @@ http://stackoverflow.com/questions/7539216/
         game.map = $('#skipre').text();
         game.hook = $('#skipre');
         console.log(game);
-
-				var fps = 27;
-				var intervalId = undefined;
-				game.run = function(){
-					intervalId = setInterval(function(){
-						game.render();
-						game.stepForward();
-					}, 1000 / fps);
-				};
-
 
 
         $('#left').click(function(){
@@ -496,13 +501,8 @@ http://stackoverflow.com/questions/7539216/
 					game.skier.turnRight();
 				});
 
-        $('#forward').click(function(){
-            game.render();
-            game.stepForward();
-        });
-
         $('#stop').click(function(){
-					clearInterval(intervalId);
+					game.stop();
 				});
         $('#start').click(function(){
 					game.run();
