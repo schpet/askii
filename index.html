@@ -39,6 +39,14 @@
 		</style>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=0;">  
 <!-- 
+
+TODO
+====
+ - smarter render so it works on mobile devices
+ - ski trails behind you
+ - jumps
+ - abominal snowman?
+
 Notes
 =====
 
@@ -515,11 +523,18 @@ http://stackoverflow.com/questions/7539216/
 
         $('#stop').click(function(){
 					game.stop();
+					$('#start').show();
+					$('#stop').hide();
 				});
+				$('#stop').hide();
+
         $('#start').click(function(){
 					game.run();
+					$('#start').hide();
+					$('#stop').show();
 				});
       });
+
     </script>
   </body>
 </html>
