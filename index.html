@@ -3,23 +3,35 @@
   <head>
     <title>Ski Free</title>
 		<style>
-			body { margin: 0px; }
+			body { margin: 0px; font-family: monospace; }}
+
 			#skier { color: red; }
 			#controls { 
 				bottom: 0px;
 				position: fixed;
-				background: #eee;
+				background: #333;
 				width: 100%;
-				border-top: 3px solid gray;
-				padding: 10px;
-				text-align: center 
+				text-align: center;
+				padding-top: 10px;
+				padding-bottom: 10px;
 			}
-			#controls button { height: 100px; width: 100px; }
+			#controls button { 
+				height: 100px;
+				background: #00a6fc;
+				display: inline-block;
+				text-align: center;
+				padding: 9px 24px 11px;
+				color: #fff;
+				text-decoration: none;
+				font-weight: bold;
+				line-height: 1;
+				position: relative;
+				cursor: pointer;
+				border: none;
+			}
 			
 			@media only screen and (min-width: 480px) {
-
 				#controls button { height: 50px; }
-
 			}
 
 
@@ -70,9 +82,9 @@ http://stackoverflow.com/questions/7539216/
   <body>
 	<div id="controls">
     <button id="left">Left</button>
-    <button id="right">Right</button>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
+    <button id="right">Right</button>
 	</div>
 	<div id="content">
 <pre id="skipre">
