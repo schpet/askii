@@ -42,6 +42,7 @@
 
 TODO
 ====
+ - make the level move around the skier... stupid scrollto is too darn slow on mobile devices
  - smarter render so it works on mobile devices
  - ski trails behind you
  - jumps
@@ -459,7 +460,9 @@ http://stackoverflow.com/questions/7539216/
 
 						var last = false;
 						
-						window.scrollTo(0, this.position * this.map.lineHeight - 100);
+            var cameraPosition = this.position * this.map.lineHeight - 100;
+            
+					  window.scrollTo(0, cameraPosition);
 
 						for(var i = 0; i < this.skier.state.length; i++){
               var original = this.map.map[this.position];
