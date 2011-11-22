@@ -97,7 +97,6 @@ http://stackoverflow.com/questions/7539216/
 	<div id="content">
 <pre id="skipre">
 
-
 ################################################################################
 ################################################################################
 ################################################################################
@@ -427,6 +426,7 @@ http://stackoverflow.com/questions/7539216/
         }
 
         function Game(){
+					this.cameraPosition = 0;
           this.position = 3;
           this.map = undefined;
           this.skier = undefined;
@@ -479,10 +479,12 @@ http://stackoverflow.com/questions/7539216/
               i = j + 1;
               lineNum++;
             }
+						
+						window.scrollTo(0, this.cameraPosition);
 
             this.hook.html(output);
+						this.cameraPosition = $('#skier').position().top - 100;
 
-						window.scrollTo(0, $('#skier').position().top - 100);
           };
 
 					this.run = function(){
