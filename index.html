@@ -427,10 +427,14 @@ http://stackoverflow.com/questions/7539216/
         }
 
 				function Map(mapElement){
+          this.lineHeight = 15;
+          this.fontSize = 12;
 					this.map = mapElement.text().split("\n");
 
           this.init = function(){
             mapElement.text("");
+            mapElement.css('line-height', this.lineHeight + 'px');
+            mapElement.css('font-size', this.fontSize+ 'px');
             $.each(this.map, function(i, element){
               mapElement.append('<div id="' + i + '">' + element + '</div>');
             });
@@ -455,7 +459,7 @@ http://stackoverflow.com/questions/7539216/
 
 						var last = false;
 						
-						// window.scrollTo(0, this.cameraPosition);
+						window.scrollTo(0, this.position * this.map.lineHeight - 100);
 
 						for(var i = 0; i < this.skier.state.length; i++){
               var original = this.map.map[this.position];
