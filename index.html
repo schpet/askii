@@ -4,8 +4,15 @@
     <title>Ski Free</title>
 		<style type="text/css">
 			body { margin: 0px; font-family: monospace; }
+      pre { margin: 0 }
 
 			.skier { color: red; }
+      .map { 
+        font-size: 12px; 
+        line-height: 15px; 
+        font-family: monospace; 
+        white-space: nowrap;
+      }
 			#controls { 
 				bottom: 0px;
 				position: fixed;
@@ -19,7 +26,6 @@
 				height: 100px;
 				background: #00a6fc;
 				display: inline-block;
-				text-align: center;
 				padding: 9px 24px 11px;
 				color: #fff;
 				text-decoration: none;
@@ -35,56 +41,8 @@
 			}
 
 
-			#content { text-align: center; }
 		</style>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=0;">  
-<!-- 
-
-TODO
-====
- - make the level move around the skier... stupid scrollto is too darn slow on mobile devices
- - smarter render so it works on mobile devices
- - ski trails behind you
- - jumps
- - abominal snowman?
-
-Notes
-=====
-
-http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/index.html
-
-http://stackoverflow.com/questions/7539216/
-
-
-           ..
-            ..O
-             -|-
-              \\
-
-                 ..
-                ..
-              O..
-             -|-
-             //
-            
-              \\
-              -|-
-               O
-
-              O
-             ~|~
-              X
-             / \
-
-
-
-             ::::
-    
-    \   \
-     \_  \_ 
-      ;;;;;       
-
--->
 
     
   </head>
@@ -98,7 +56,7 @@ http://stackoverflow.com/questions/7539216/
 	</div>
 
 	<div id="content">
-    <pre id="skipre"></pre>
+    <pre id="skipre" class="map"></pre>
   </div>
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -142,26 +100,74 @@ http://stackoverflow.com/questions/7539216/
 					}
         }
 
-				function Map(map, hook){
+				function Map(hook){
           this.lineHeight = 15;
           this.fontSize = 12;
           this.lines = 30;
+          this.maxChars = undefined;
+          this.map = []
 
-					this.map = map.split("\n");
           this.elements = []
           this.hook = hook;
 
           this.init = function(){
             var hook = this.hook;
             hook.text("");
-            hook.css('line-height', this.lineHeight + 'px');
-            hook.css('font-size', this.fontSize+ 'px');
+
+            hook.css('background-color', 'red');
+            hook.height($(window).height() - $('#controls').innerHeight());
+
+            this.updateMaxChars();
+
             for(var i = 0; i < this.lines; i++){
-              
-              hook.append('<div id="' + i + '">' + this.map[i] + '</div>');
+              var s = this.getRandomLine();
+              this.map.push(s);
+              hook.append('<div id="' + i + '">' + s + '</div>');
               this.elements[i] = $('#' + i);
             }
+          }
 
+          this.updateMaxChars = function(){
+            // http://stackoverflow.com/questions/8113874
+
+            var span = $('<span></span>');
+            span.addClass('map');
+
+            $('body').append(span);
+
+            var documentWidth = $(document).width();
+            var max = 500;
+            var fit = undefined;
+
+            for (var i = 0; i < max; i++){
+              span.text(span.text() + "X");
+              if (span.width() > documentWidth) {
+                this.maxChars = i - 1;
+                break;
+              }
+            }
+            span.remove();
+          }
+
+          this.stepForward = function(){
+              this.map.shift();
+              var s = this.getRandomLine();
+              this.map.push(s);
+          }
+
+          // returns mostly backticks, with some spice!
+          // todo seeded random
+          this.getRandomLine = function(){
+            var s = '';
+            for(var i = 0; i < this.maxChars; i++){
+              var rand = Math.random()
+              if(rand < 0.99){
+                s += '`'
+              } else {
+                s += '#'
+              }
+            }
+            return s;
           }
 				}
 
@@ -177,25 +183,23 @@ http://stackoverflow.com/questions/7539216/
           this.stepForward = function(){
             this.position++;
 						this.skier.stepForward();
+            this.map.stepForward();
 
           };
           this.render = function(){
-            console.log("rendered");
             
             for(var i = 0; i < this.map.lines; i++){
               var position = i + this.position;
-              this.map.elements[i].html(this.map.map[position]);
+              this.map.elements[i].html(this.map.map[i]);
 
-              console.log(this.map.map[i]);
               // will crash eventually
             }
-            console.log(this.map.elements);
           };
 
 					this.run = function(){
 						var self = this;
 						this.timeoutId = setTimeout(function(){ 
-              if(self.position > self.map.map.length - self.skier.state.length)
+              if(self.position > self.map.maxChars - self.skier.state.length)
                 self.position = 0;
 
 							self.render(); 
@@ -211,20 +215,21 @@ http://stackoverflow.com/questions/7539216/
 					};
         };
 
-        
+        $(window).resize(function() {
+          console.log("TODO: recalculate map - not on every resize call though");
+        });
+
         var breh = new Skier();
         console.log(breh);
         var game = new Game();
 
         game.skier = breh;
         game.hook = $('#skipre');
-        $.get('map2.txt', function(data) {
-            game.map = new Map(data, $('#skipre'));
-            game.map.init();
-        });
+
+        game.map = new Map($('#skipre'));
+        game.map.init();
 
         console.log(game);
-
 
         $('#left').click(function(){
 					game.skier.turnLeft();
