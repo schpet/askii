@@ -139,7 +139,6 @@
             var max = 500;
             var fit = undefined;
 
-            try {
             var s = ""
             for (var i = 0; i < max; i++){
               s += "X";
@@ -148,9 +147,6 @@
                 this.maxChars = i - 1;
                 break;
               }
-            }
-            } catch(err){
-              alert(err);
             }
             span.remove();
           }
