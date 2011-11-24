@@ -139,8 +139,10 @@
             var max = 500;
             var fit = undefined;
 
+            var s = ""
             for (var i = 0; i < max; i++){
-              span.text(span.text() + "X");
+              s += "X";
+              span.text(s);
               if (span.width() > documentWidth) {
                 this.maxChars = i - 1;
                 break;
