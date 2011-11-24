@@ -133,20 +133,24 @@
             var span = $('<span></span>');
             span.addClass('map');
 
-            $('body').append(span);
+            $('#content').append(span);
 
             var documentWidth = $(document).width();
             var max = 500;
             var fit = undefined;
 
+            try {
             var s = ""
             for (var i = 0; i < max; i++){
               s += "X";
               span.text(s);
-              if (span.width() > documentWidth) {
+              if(span.width() > documentWidth) {
                 this.maxChars = i - 1;
                 break;
               }
+            }
+            } catch(err){
+              alert(err);
             }
             span.remove();
           }
