@@ -2,60 +2,59 @@
 <html>
   <head>
     <title>Ski Free</title>
-		<style type="text/css">
-			body { margin: 0px; font-family: monospace; }
+    <style type="text/css">
+      body { margin: 0px; font-family: monospace; }
       pre { margin: 0 }
 
-			.skier { color: red; }
+      .skier { color: red; }
       .map { 
         font-size: 12px; 
         line-height: 15px; 
         font-family: monospace; 
-        white-space: nowrap;
+        /*white-space: nowrap;*/
       }
-			#controls { 
-				bottom: 0px;
-				position: fixed;
-				background: #333;
-				width: 100%;
-				text-align: center;
-				padding-top: 10px;
-				padding-bottom: 10px;
-			}
-			#controls button { 
-				height: 100px;
-				background: #00a6fc;
-				display: inline-block;
-				padding: 9px 24px 11px;
-				color: #fff;
-				text-decoration: none;
-				font-weight: bold;
-				line-height: 1;
-				position: relative;
-				cursor: pointer;
-				border: none;
-			}
-			
-			@media only screen and (min-width: 480px) {
-				#controls button { height: 50px; }
-			}
+      #controls { 
+        bottom: 0px;
+        position: fixed;
+        background: #333;
+        width: 100%;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      #controls button { 
+        height: 100px;
+        background: #00a6fc;
+        display: inline-block;
+        padding: 9px 24px 11px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        line-height: 1;
+        position: relative;
+        cursor: pointer;
+        border: none;
+      }
+      
+      @media only screen and (min-width: 480px) {
+        #controls button { height: 50px; }
+      }
 
 
-		</style>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=0;">  
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=0;">  
 
     
   </head>
   <body>
-	<div id="controls">
+  <div id="controls">
     <button id="left">Left</button>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
     <button id="right">Right</button>
-    <button id="test">test</button>
-	</div>
+  </div>
 
-	<div id="content">
+  <div id="content">
     <pre id="skipre" class="map"></pre>
   </div>
 
@@ -67,6 +66,8 @@
         function Skier(world){
           this.x = 0;
           this.width = 6;
+          this.height = 4;
+          this.world = world;
 
           this.states = {
             'right': [
@@ -92,15 +93,16 @@
             this.state = this.states['right'];
           }
 
-					this.stepForward = function(){
-						if(this.state == this.states['left'] && this.x > 0)
-							this.x--;
-						else if(this.state == this.states['right'] && this.x < 80 - this.width)
-							this.x++;
-					}
+          this.stepForward = function(){
+            var max = this.world.map.maxChars;
+            if(this.state == this.states['left'] && this.x > 0)
+              this.x--;
+            else if(this.state == this.states['right'] && this.x < max - this.width)
+              this.x++;
+          }
         }
 
-				function Map(hook){
+        function Map(hook){
           this.lineHeight = 15;
           this.fontSize = 12;
           this.lines = 30;
@@ -114,7 +116,6 @@
             var hook = this.hook;
             hook.text("");
 
-            hook.css('background-color', 'red');
             hook.height($(window).height() - $('#controls').innerHeight());
 
             this.updateMaxChars();
@@ -148,6 +149,9 @@
                 break;
               }
             }
+            var windowHeight = $(window).height() - $('#controls').innerHeight();
+            var lineHeight = span.height();
+            this.lines = Math.floor(windowHeight / lineHeight);
             span.remove();
           }
 
@@ -171,59 +175,71 @@
             }
             return s;
           }
-				}
+        }
 
         function Game(){
-					this.cameraPosition = 0;
+          this.cameraPosition = 0;
           this.position = 3;
           this.map = undefined;
           this.skier = undefined;
           this.hook = undefined;
-					this.delay = 50;
-					this.timeoutId = undefined;
+          this.delay = 50;
+          this.timeoutId = undefined;
+          this.skierPosition = 4; // todo move me to map, calculate by %
 
           this.stepForward = function(){
             this.position++;
-						this.skier.stepForward();
+            this.skier.stepForward();
             this.map.stepForward();
 
           };
           this.render = function(){
+
             
             for(var i = 0; i < this.map.lines; i++){
-              var position = i + this.position;
-              this.map.elements[i].html(this.map.map[i]);
+              var original = this.map.map[i];
+              var line = undefined;
 
-              // will crash eventually
+              if(i >= this.skierPosition && i < this.skierPosition + this.skier.height){
+                var relativePos = i - this.skierPosition;
+
+                line = original.substr(0, this.skier.x);
+                line += '<span class="skier"'; 
+                line += (relativePos == 1) ? ' id="skier">': '>';
+                line += this.skier.state[relativePos];
+                line += '</span>';
+                line += original.substr(this.skier.x + this.skier.width);
+              }  else {
+                line = original;
+              }
+
+              this.map.elements[i].html(line);
             }
           };
 
-					this.run = function(){
-						var self = this;
-						this.timeoutId = setTimeout(function(){ 
+          this.run = function(){
+            var self = this;
+            this.timeoutId = setTimeout(function(){ 
               if(self.position > self.map.maxChars - self.skier.state.length)
                 self.position = 0;
 
-							self.render(); 
-							self.stepForward() 
-							self.run();
-						}, this.delay);
-					};
+              self.render(); 
+              self.stepForward() 
+              self.run();
+            }, this.delay);
+          };
 
-					this.stop = function(){
-						if(this.timeoutId){
-							clearTimeout(this.timeoutId);
-						}
-					};
+          this.stop = function(){
+            if(this.timeoutId){
+              clearTimeout(this.timeoutId);
+            }
+          };
         };
 
-        $(window).resize(function() {
-          console.log("TODO: recalculate map - not on every resize call though");
-        });
 
-        var breh = new Skier();
         console.log(breh);
         var game = new Game();
+        var breh = new Skier(game);
 
         game.skier = breh;
         game.hook = $('#skipre');
@@ -232,38 +248,41 @@
         game.map.init();
 
         console.log(game);
+        $(window).resize(function() {
+          game.map.init();
+        });
 
         $('#left').click(function(){
-					game.skier.turnLeft();
+          game.skier.turnLeft();
         });
-				shortcut.add("a",function() {
-					game.skier.turnLeft();
-				});
-				shortcut.add("left",function() {
-					game.skier.turnLeft();
-				});
+        shortcut.add("a",function() {
+          game.skier.turnLeft();
+        });
+        shortcut.add("left",function() {
+          game.skier.turnLeft();
+        });
         $('#right').click(function(){
-					game.skier.turnRight();
+          game.skier.turnRight();
         });
-				shortcut.add("d",function() {
-					game.skier.turnRight();
-				});
-				shortcut.add("right",function() {
-					game.skier.turnRight();
-				});
+        shortcut.add("d",function() {
+          game.skier.turnRight();
+        });
+        shortcut.add("right",function() {
+          game.skier.turnRight();
+        });
 
         $('#stop').click(function(){
-					game.stop();
-					$('#start').show();
-					$('#stop').hide();
-				});
-				$('#stop').hide();
+          game.stop();
+          $('#start').show();
+          $('#stop').hide();
+        });
+        $('#stop').hide();
 
         $('#start').click(function(){
-					game.run();
-					$('#start').hide();
-					$('#stop').show();
-				});
+          game.run();
+          $('#start').hide();
+          $('#stop').show();
+        });
       });
 
     </script>
