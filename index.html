@@ -34,7 +34,10 @@
         position: relative;
         cursor: pointer;
         border: none;
+        margin: 0 4px;
       }
+      .left { float: left; }
+      .right { float: right; }
       
       @media only screen and (min-width: 480px) {
         #controls button { height: 50px; }
@@ -48,10 +51,10 @@
   </head>
   <body>
   <div id="controls">
-    <button id="left">Left</button>
+    <button id="left" class="left">Left</button>
     <button id="start">Start</button>
     <button id="stop">Stop</button>
-    <button id="right">Right</button>
+    <button id="right" class="right">Right</button>
   </div>
 
   <div id="content">
