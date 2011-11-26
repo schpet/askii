@@ -58,7 +58,7 @@
   </div>
 
   <div id="content">
-    <pre id="skipre" class="map"></pre>
+    <pre id="askii" class="map"></pre>
   </div>
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -245,9 +245,9 @@
         var breh = new Skier(game);
 
         game.skier = breh;
-        game.hook = $('#skipre');
+        game.hook = $('#askii');
 
-        game.map = new Map($('#skipre'));
+        game.map = new Map($('#askii'));
         game.map.init();
 
         console.log(game);
