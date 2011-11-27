@@ -45,14 +45,10 @@ function Skier(world){
         }
     };
     this.transformations['up'] = function(){ 
-        if(self.y > 0 ){
-            self.y--;
-        }
+        if(self.y > 0)
+            self.y--
     };
     this.transformations['down'] = function(){ 
-        if(self.y < self.world.map.lines - self.height){
-            self.y++;
-        }
     };
 
     this.trackIndent = {};
@@ -83,7 +79,6 @@ function Skier(world){
         } else if(position >= self.y && position < self.y + self.height ){
             
             var offset = position - self.y;
-            console.log(offset);
 
             if(offset == self.height - 3){
                 //track 
@@ -235,7 +230,7 @@ function Game(){
     this.map = undefined;
     this.skier = undefined;
     this.hook = undefined;
-    this.delay = 50;
+    this.delay = 40;
     this.timeoutId = undefined;
     this.skierPosition = 4; // todo move me to map, calculate by %
 
@@ -304,6 +299,7 @@ shortcut.add("up",function() {
 
 shortcut.add("down",function() {
     game.skier.state = 'down';
+    game.skier.y++;
 });
 
 $('#left').click(function(){
@@ -313,17 +309,17 @@ $('#right').click(function(){
     game.skier.turnRight();
 });
 
-$('#stop').click(function(){
+$('.stop').click(function(){
     game.stop();
-    $('#start').show();
-    $('#stop').hide();
+    $('.start').show();
+    $('.stop').hide();
 });
 
-$('#stop').hide();
+$('.stop').hide();
 
-$('#start').click(function(){
+$('.start').click(function(){
     game.run();
-    $('#start').hide();
-    $('#stop').show();
+    $('.start').hide();
+    $('.stop').show();
 });
 
