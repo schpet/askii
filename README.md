@@ -3,10 +3,10 @@ ascii skiing game
 TODO
 ====
 
-  * resize
-  * add skier!
+  
+  * resize without breaking
   * and trails!
-  * generate levels on the fly
+  * levels
   * collidable characters with a crash animation
   * figure out what works:
     * pop top div off, append div to bottom
@@ -53,7 +53,7 @@ http://stackoverflow.com/questions/7539216/
 
              ::::
     
-    \   \
-     \_  \_ 
-      ;;;;;       
+      \   \
+       \_  \_ 
+        ;;;;;       
 
