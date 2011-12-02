@@ -33,6 +33,7 @@ function Skier(world){
                     "  \"  "
             ]
     };
+
     this.transformations = {};
     this.transformations['left'] = function(){ 
         if(self.x > 0){
@@ -148,6 +149,27 @@ function Skier(world){
     }
 }
 
+function Tree(x, y){
+    this.x = x;
+    this.y = y;
+    /*
+      
+      ^
+     /|\
+    //^\\
+      | 
+
+    TODO: Fallen state
+    */
+    this.state = [
+        '  ^  ',
+        ' /|\\ ',
+        '//|\\\\',
+        '  |  '
+        ];
+
+}
+
 function Map(hook){
     this.lineHeight = 15;
     this.fontSize = 12;
@@ -208,13 +230,11 @@ function Map(hook){
         this.map.push(s);
     }
 
-    // returns mostly backticks, with some spice!
-    // todo seeded random
     this.getRandomLine = function(){
         var s = '';
         for(var i = 0; i < this.maxChars; i++){
             var rand = Math.random()
-                if(rand < 0.99){
+                if(rand < 0.995){
                     s += ' '
                 } else {
                     s += '#'
@@ -227,8 +247,11 @@ function Map(hook){
 function Game(){
     this.cameraPosition = 0;
     this.position = 3;
+
     this.map = undefined;
     this.skier = undefined;
+    this.trees = [];
+
     this.hook = undefined;
     this.delay = 40;
     this.timeoutId = undefined;
