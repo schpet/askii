@@ -1,6 +1,7 @@
 function Skier(world){
     var self = this;
 
+
     this.x = 4;
     this.y = 4;
     this.width = 5;
