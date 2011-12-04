@@ -69,6 +69,10 @@ function Skier(world){
         this.transformations[this.state]();
     }
 
+
+    this.render = function(textBlock){
+    };
+
     this.render = function(map, position){
         // get 
         var line = '';
@@ -167,18 +171,20 @@ function Tree(x, y){
         '//|\\\\',
         '  |  '
         ];
-
 }
 
 function Map(hook){
-    this.lineHeight = 15;
-    this.fontSize = 12;
+    this.lineHeight = undefined;
+    this.fontSize = undefined;
     this.lines = 30;
     this.maxChars = undefined;
     this.map = [];
 
+    this.offset = 0;
+
     this.elements = [];
     this.hook = hook;
+    var self = this;
 
     this.init = function(){
         var hook = this.hook;
@@ -209,15 +215,17 @@ function Map(hook){
         var max = 500;
         var fit = undefined;
 
-        var s = ""
-            for (var i = 0; i < max; i++){
-                s += "X";
-                span.text(s);
-                if(span.width() > documentWidth) {
-                    this.maxChars = i - 1;
-                    break;
-                }
+        var s = "";
+
+        for (var i = 0; i < max; i++){
+            s += "X";
+            span.text(s);
+            if(span.width() > documentWidth) {
+                this.maxChars = i - 1;
+                break;
             }
+        }
+
         var windowHeight = $(window).height() - $('#controls').innerHeight();
         var lineHeight = span.height();
         this.lines = Math.floor(windowHeight / lineHeight);
@@ -225,23 +233,106 @@ function Map(hook){
     }
 
     this.stepForward = function(){
-        this.map.shift();
-        var s = this.getRandomLine();
-        this.map.push(s);
+        // this.map.shift();
+        // var s = this.getRandomLine();
+        // this.map.push(s);
+        this.offset++;
     }
 
     this.getRandomLine = function(){
         var s = '';
         for(var i = 0; i < this.maxChars; i++){
-            var rand = Math.random()
-                if(rand < 0.995){
-                    s += ' '
-                } else {
-                    s += '#'
-                }
+            var rand = Math.random();
+
+            if(rand < 0.995){
+                s += ' '
+            } else {
+                s += '#'
+            }
         }
         return s;
     }
+    this.getBlankLine = function(){
+        var s = '';
+        for(var i = 0; i < this.maxChars; i++){
+           s += ',';
+        }
+        return s;
+    }
+
+    /*
+
+
+##############
+####0#########
+###-|-########
+###/ \########
+##############
+##############
+
+        map.replace(x, y, content){ }
+        guy = [];
+        guy[0] = " 0 ";
+        guy[1] = "-|-";
+        guy[2] = "/ \";
+
+        map.replace(4, 2, guy){
+            go to the line,
+            replace non space stuff with characters
+
+            objects will handle collisions based on coordinates
+        }
+
+
+        map will have relative position and real offset
+    */
+
+    /**
+     * @param 
+     *      gameObject - a game object with some properties
+     *
+     *                   x
+     *                   y
+     *                   // width
+     *                   height
+     *                   state
+     *                   className
+     *                   
+     *                   TODO: make a game object interface 
+     */
+    this.addGameObject = function(gameObject){
+        // skip to line
+        // step over each character, not counting html tags
+        // return a copy of the map with the game object added
+        console.log("addGameObject y = " + gameObject.y);
+        
+        for(var line = gameObject.y; 
+                line < gameObject.y + gameObject.height; line++){
+
+            var lineText = this.map[line - this.offset];
+            var tag = false;
+            var textColumn = 0;
+
+            console.log("offset: " + this.offset);
+            console.log("linetext : " + lineText);
+            for(var htmlColumn = 0; htmlColumn < lineText.length; 
+                    htmlColumn++){
+                if(lineText.charAt(htmlColumn) == "<"){
+                    tag = true;
+                    console.log("tag is true");
+                } else if(tag && lineText.charAt(htmlColumn) == ">"){
+                    tag = false;
+                    console.log("tag is false");
+                }
+                // xxx 
+
+                if(!tag){
+                    textColumn++;
+                }
+            }
+        }
+    }
+
 }
 
 function Game(){
@@ -261,28 +352,37 @@ function Game(){
         this.position++;
         this.skier.stepForward();
         this.map.stepForward();
+        
+        // handle colisions
 
     };
     this.render = function(){
-        var visible = "";
+        var textBlock = "";
+
+        // render map, return the block of text
+        // create the block of text 
+        // render trees
+        // render skier
+        this.map.addGameObject(this.skier);
 
         for(var i = 0; i < this.map.lines; i++){
             var line = this.skier.render(this.map.map, i);
-            visible += line + "\n";
+            textBlock += line + "\n";
         }
-        this.map.hook.html(visible);
+        this.map.hook.html(textBlock);
     };
 
     this.run = function(){
         var self = this;
         this.timeoutId = setTimeout(function(){ 
-                if(self.position > self.map.maxChars - self.skier.state.length)
-                self.position = 0;
+                if(self.position > self.map.maxChars - self.skier.state.length){
+                    self.position = 0;
+                }
 
                 self.render(); 
                 self.stepForward() 
                 self.run();
-                }, this.delay);
+            }, this.delay);
     };
 
     this.stop = function(){
@@ -293,7 +393,6 @@ function Game(){
 };
 
 
-console.log(breh);
 var game = new Game();
 var breh = new Skier(game);
 
