@@ -504,17 +504,13 @@ function Game(){
             //check for colision with skier
             if(this.checkCollision(value)){
                 this.gameObjects.splice(i, 1);
-                console.log("XXXX");
                 this.stop();
-                console.log("ZZZZ");
-                this.test();
             }
         }
         
         this.skier.stepForward();
         // handle colisions
     };
-    this.test = function(){ alert('test'); };
 
     this.render = function(){
         this.map.clearScratchMap();
