@@ -1,178 +1,214 @@
-function Skier(world){
-    var self = this;
+/**
+ * TODO
+ *  - straighten out style w/ consistent class types
+ *  - prevent whitespace from overriding bg
+ *  - colisions
+ *  - dinosaurs
+ *  - tracks
+ */
 
+/* Via http://ejohn.org/blog/simple-javascript-inheritance/
+ * Because JS doesn't come with things like inheritance
+ */
 
-    this.x = 4;
-    this.y = 4;
-    this.width = 5;
-    this.height = 4;
-    this.world = world;
-
-    this.states = {
-        'right': [
-                    "  O  ", 
-                    " -|- ",
-                    "  \\\\ ",
-                    "   ``"
-            ],
-        'left': [
-                    "  O  ",
-                    " -|- ",
-                    " //  ",
-                    "``   "
-            ],
-        'down': [
-                    "  O  ",
-                    " -|- ",
-                    " | | ",
-                    " ' ' "
-            ],
-        'up': [
-                    "  O  ",
-                    " -|- ",
-                    " \\ / ",
-                    "  \"  "
-            ]
-    };
-
-    this.transformations = {};
-    this.transformations['left'] = function(){ 
-        if(self.x > 0){
-            self.x--;
-        }
-    };
-    this.transformations['right'] = function(){ 
-        if(self.x < self.world.map.maxChars){
-            self.x++;
-        }
-    };
-    this.transformations['up'] = function(){ 
-        if(self.y > 0)
-            self.y--
-    };
-    this.transformations['down'] = function(){ 
-    };
-
-    this.trackIndent = {};
-    this.trackIndent['left'] = [2, 3];
-    this.trackIndent['right'] = [1, 2];
-    this.trackIndent['down'] = [1, 3];
-    this.trackIndent['up'] = [1, 3];
+/* Simple JavaScript Inheritance
+ * By John Resig http://ejohn.org/
+ * MIT Licensed.
+ */
+// Inspired by base2 and Prototype
+(function(){
+  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+  // The base Class implementation (does nothing)
+  this.Class = function(){};
+  
+  // Create a new Class that inherits from this class
+  Class.extend = function(prop) {
+    var _super = this.prototype;
     
-    this.state = 'right';
-
-    this.getState = function(){
-        return this.states[this.state];
+    // Instantiate a base class (but only create the instance,
+    // don't run the init constructor)
+    initializing = true;
+    var prototype = new this();
+    initializing = false;
+    
+    // Copy the properties over onto the new prototype
+    for (var name in prop) {
+      // Check if we're overwriting an existing function
+      prototype[name] = typeof prop[name] == "function" && 
+        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
+        (function(name, fn){
+          return function() {
+            var tmp = this._super;
+            
+            // Add a new ._super() method that is the same method
+            // but on the super-class
+            this._super = _super[name];
+            
+            // The method only need to be bound temporarily, so we
+            // remove it when we're done executing
+            var ret = fn.apply(this, arguments);        
+            this._super = tmp;
+            
+            return ret;
+          };
+        })(name, prop[name]) :
+        prop[name];
     }
+    
+    // The dummy class constructor
+    function Class() {
+      // All construction is actually done in the init method
+      if ( !initializing && this.init )
+        this.init.apply(this, arguments);
+    }
+    
+    // Populate our constructed prototype object
+    Class.prototype = prototype;
+    
+    // Enforce the constructor to be what we expect
+    Class.prototype.constructor = Class;
 
-    this.stepForward = function(){
+    // And make this class extendable
+    Class.extend = arguments.callee;
+    
+    return Class;
+  };
+})();
+
+var GameObject = Class.extend({
+    init: function(x, y, width, height, className){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.className = className;
+    },
+    getState: function(){
+        console.log('failed to override getState');
+    },
+    stepForward: function(){
+        console.log('step forward');
+    }
+});
+
+var Skier = GameObject.extend({
+    init: function(world){
+        this._super(4, 4, 5, 4, "skier");
+
+        this.world = world;
+
+        var self = this;
+
+        this.states = {
+            'right': [
+                        "  O  ", 
+                        " -|- ",
+                        "  \\\\ ",
+                        "   ``"
+                ],
+            'left': [
+                        "  O  ",
+                        " -|- ",
+                        " //  ",
+                        "``   "
+                ],
+            'down': [
+                        "  O  ",
+                        " -|- ",
+                        " | | ",
+                        " ' ' "
+                ],
+            'up': [
+                        "  O  ",
+                        " -|- ",
+                        " \\ / ",
+                        "  \"  "
+                ]
+        };
+
+        this.transformations = {};
+        this.transformations['left'] = function(){ 
+            if(self.x > 0){
+                self.x--;
+            }
+        };
+        this.transformations['right'] = function(){ 
+            if(self.x < self.world.map.maxChars){
+                self.x++;
+            }
+        };
+        this.transformations['up'] = function(){ 
+            if(self.y > 0)
+                self.y--
+        };
+        this.transformations['down'] = function(){ 
+        };
+
+        this.trackIndent = {};
+        this.trackIndent['left'] = [2, 3];
+        this.trackIndent['right'] = [1, 2];
+        this.trackIndent['down'] = [1, 3];
+        this.trackIndent['up'] = [1, 3];
+        
+        this.state = 'right';
+    },
+    getState: function(){
+        return this.states[this.state];
+    },
+    stepForward: function(){
         var maxX = this.world.map.maxChars;
         this.transformations[this.state]();
-    }
-
-
-    this.render = function(textBlock){
-    };
-
-    this.render = function(map, position){
-        // get 
-        var line = '';
-
-        var original = map[position];
-        if(position < self.y){
-            // long ago 
-            return original;
-        } else if(position >= self.y && position < self.y + self.height ){
-            
-            var offset = position - self.y;
-
-            if(offset == self.height - 3){
-                //track 
-                var leftTrackPos = self.trackIndent[self.state][0];
-                var rightTrackPos = self.trackIndent[self.state][1];
-                var cursor = self.x + leftTrackPos;
-
-                var trackLine = original.substr(0, cursor);
-                cursor++;
-                trackLine += ".";
-                for(; cursor < self.x + rightTrackPos; cursor++){
-                    trackLine += original.charAt(cursor);
-                }
-                trackLine += ".";
-                cursor++;
-
-                trackLine += original.substr(cursor);
-
-                
-
-                map[position] = trackLine;
-            }
-
-            var skier = self.getState()[offset];
-            var original = map[position];
-
-            line = original.substr(0, self.x);
-            for(var i = 0; i < skier.length; i++){
-                var character = skier.charAt(i);
-                if(character == ' '){
-                    line += original.charAt(self.x + i);
-                } else {
-                    line += '<span class="skier">'; 
-                    line += character;
-                    line += '</span>';
-                }
-            }
-            line += original.substr(self.x + self.width);
-            return line;
+        this.y++;
+    },
+    render: function(map, position){
+        return map[position];
+    },
+    getCollisionPoint: function(){
+        if(this.state == 'left'){
+            return [0, 3];
+        } else if(this.state == 'right'){
+            return [4, 3];
         } else {
-            return map[position];
+            return [2, 3];
         }
-
-/*
-        if(offset == 0){
-            original = "zzzzzzz";
-        } else {
-
-            var skier = self.getState()[offset - 1];
-
-            line = original.substr(0, self.x);
-            for(var i = 0; i < skier.length; i++){
-                var character = skier.charAt(i);
-                if(character == ' '){
-                    line += original.charAt(self.x + i);
-                } else {
-                    line += '<span class="skier">'; 
-                    line += character;
-                    line += '</span>';
-                }
-            }
-            line += original.substr(self.x + self.width);
-        }
-
-*/
-        return line;
     }
-}
+});
 
-function Tree(x, y){
-    this.x = x;
-    this.y = y;
-    /*
-      
-      ^
-     /|\
-    //^\\
-      | 
+var Tree = GameObject.extend({
+    init: function(x, y){
+        this._super(x, y, 5, 4);
 
-    TODO: Fallen state
-    */
-    this.state = [
-        '  ^  ',
-        ' /|\\ ',
-        '//|\\\\',
-        '  |  '
+        /*
+          ^
+         /|\
+        //^\\
+          | 
+
+        TODO: Fallen state
+        */
+
+        this.state = [
+            '  ^  ',
+            ' /|\\ ',
+            '//^\\\\',
+            '  |  '
+            ];
+
+        this.collidable = [
+            [2,2],
+            [1,3],
+            [0,4],
+            [2,2]
         ];
-}
+    },
+    getState: function(){
+        return this.state;
+    },
+    getHitBox: function(){
+        return { tl: [3,2], br: [3,2]  };
+    },
+    stepForward: function(){ }
+})
 
 function Map(hook){
     this.lineHeight = undefined;
@@ -180,6 +216,7 @@ function Map(hook){
     this.lines = 30;
     this.maxChars = undefined;
     this.map = [];
+    this.scratchMap = undefined;
 
     this.offset = 0;
 
@@ -197,7 +234,8 @@ function Map(hook){
 
         var visible  = "";
         for(var i = 0; i < this.lines; i++){
-            var s = this.getRandomLine();
+            // var s = this.getRandomLine();
+            var s = this.getBlankLine();
             this.map.push(s);
             visible  += s + "\n";
         }
@@ -256,7 +294,7 @@ function Map(hook){
     this.getBlankLine = function(){
         var s = '';
         for(var i = 0; i < this.maxChars; i++){
-           s += ',';
+           s += ' ';
         }
         return s;
     }
@@ -288,50 +326,73 @@ function Map(hook){
         map will have relative position and real offset
     */
 
+    this.clearScratchMap = function(){
+        this.scratchMap = this.map.slice(0);
+    }
+
     /**
      * @param 
      *      gameObject - a game object with some properties
      *
-     *                   x
-     *                   y
-     *                   // width
-     *                   height
-     *                   state
-     *                   className
-     *                   
-     *                   TODO: make a game object interface 
      */
-    this.addGameObject = function(gameObject){
+    this.renderGameObject = function(gameObject){
         // skip to line
         // step over each character, not counting html tags
         // return a copy of the map with the game object added
-        console.log("addGameObject y = " + gameObject.y);
         
         for(var line = gameObject.y; 
                 line < gameObject.y + gameObject.height; line++){
 
-            var lineText = this.map[line - this.offset];
-            var tag = false;
-            var textColumn = 0;
 
-            console.log("offset: " + this.offset);
-            console.log("linetext : " + lineText);
-            for(var htmlColumn = 0; htmlColumn < lineText.length; 
-                    htmlColumn++){
-                if(lineText.charAt(htmlColumn) == "<"){
-                    tag = true;
-                    console.log("tag is true");
-                } else if(tag && lineText.charAt(htmlColumn) == ">"){
-                    tag = false;
-                    console.log("tag is false");
-                }
-                // xxx 
+            var position = line - this.offset;
+            if(position >= 0 && position < this.lines){
 
-                if(!tag){
-                    textColumn++;
+                var textLine = this.scratchMap[position];
+                var modifiedLine = '';
+
+                var tag = false;
+                var textColumn = 0;
+
+
+                for(var htmlColumn = 0; htmlColumn < textLine.length; 
+                        htmlColumn++){
+
+                    if(textLine.charAt(htmlColumn) == "<"){
+                        tag = true;
+                        console.log("tag is true");
+                    } else if(tag && textLine.charAt(htmlColumn) == ">"){
+                        tag = false;
+                        console.log("tag is false");
+                    }
+
+                    if(textColumn >= gameObject.x && 
+                            textColumn < gameObject.x + gameObject.width){
+
+                        var stateX = textColumn - gameObject.x;
+                        var stateY = line - gameObject.y;
+                        character = gameObject.getState()[stateY].charAt(stateX); 
+
+                        if(character != ' '){
+                            modifiedLine += character;
+                        } else {
+                            modifiedLine += textLine.charAt(htmlColumn);
+                        }
+                    } else {
+                        modifiedLine += textLine.charAt(htmlColumn);
+                    }
+
+                    
+
+
+                    if(!tag){
+                        textColumn++;
+                    }
                 }
+
+                this.scratchMap[line - this.offset] = modifiedLine;
             }
         }
+
     }
 
 }
@@ -339,50 +400,115 @@ function Map(hook){
 function Game(){
     this.cameraPosition = 0;
     this.position = 3;
+    this.skier = undefined;
 
     this.map = undefined;
-    this.skier = undefined;
     this.trees = [];
 
     this.hook = undefined;
     this.delay = 40;
     this.timeoutId = undefined;
-    this.skierPosition = 4; // todo move me to map, calculate by %
+
+    this.gameObjects = [];
+
+    this.checkCollision = function(gameObject, skier){
+        if(skier == undefined){
+            skier = this.skier;
+        }
+
+        var cp = skier.getCollisionPoint();
+
+        var sx = cp[0] + skier.x;
+        var sy = cp[1] + skier.y;
+
+
+        var bt = gameObject.y;
+        var bb = gameObject.y + gameObject.height - 1;
+        if(sy >= bt && sy <= bb){
+            var bl = gameObject.x;
+            var br = gameObject.x + gameObject.width - 1;
+            // vertical = yep
+            if(sx >= bl && sx <= br){
+                // horizontal = yep
+                
+                // determine which row we're at
+                var posY = sy - bt;
+                var posX = sx - bl;
+                var collidable = gameObject.collidable[posY];
+
+                if(sx >= bl + collidable[0]
+                    && sx <= bl + collidable[1]){
+                    alert("Ouch. Collision at game object row "
+                            + posY
+                            + ", column " + posX);
+                }
+            }
+        }
+        
+        /*
+        if(skierBottom > objectTop && skierBottom < objectBottom){
+            //  bottom of skier might be touching
+            //  figure out how
+
+            var objectL = gameObject.x;
+            var objectR = gameObject.x + gameObject.width;
+            
+            if(objectL > skier.x && objectL < skier.x + skier.width){
+                alert("collision");
+            } else if(objectR > skier.x && 
+                    objectR < skier.x + skier.width){
+                alert("collision");
+            }
+        } else if(objectBottom > skierTop && objectBottom < skierBottom){
+            //
+        }
+        */
+
+    }
 
     this.stepForward = function(){
         this.position++;
-        this.skier.stepForward();
         this.map.stepForward();
+
+        for(var i = 0; i < this.gameObjects.length; i++){
+            var value = this.gameObjects[i];
+            if(value.y < this.map.offset){
+                this.gameObjects.splice(i, 1);
+            } else {
+                value.stepForward();
+            }
+
+
+            //check for colision with skier
+            this.checkCollision(value);
+            
+        }
+        
+        this.skier.stepForward();
+
         
         // handle colisions
 
     };
     this.render = function(){
-        var textBlock = "";
+        this.map.clearScratchMap();
+        
+        var self = this;
+        $.each(this.gameObjects, function(index, gameObject){
+            self.map.renderGameObject(gameObject);
+        });
 
-        // render map, return the block of text
-        // create the block of text 
-        // render trees
-        // render skier
-        this.map.addGameObject(this.skier);
+        this.map.renderGameObject(this.skier);
 
-        for(var i = 0; i < this.map.lines; i++){
-            var line = this.skier.render(this.map.map, i);
-            textBlock += line + "\n";
-        }
-        this.map.hook.html(textBlock);
+        this.map.hook.html(this.map.scratchMap.join("\n"));
     };
 
     this.run = function(){
         var self = this;
         this.timeoutId = setTimeout(function(){ 
-                if(self.position > self.map.maxChars - self.skier.state.length){
-                    self.position = 0;
-                }
-
-                self.render(); 
-                self.stepForward() 
-                self.run();
+            self.render(); 
+            self.stepForward() 
+            self.run();
             }, this.delay);
     };
 
@@ -396,12 +522,21 @@ function Game(){
 
 var game = new Game();
 var breh = new Skier(game);
-
 game.skier = breh;
-game.hook = $('#askii');
+
 
 game.map = new Map($('#askii'));
 game.map.init();
+
+for(var i = 15; i < 300; i++){
+    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+}
+
+game.hook = $('#askii');
 
 console.log(game);
 
@@ -410,26 +545,26 @@ $(window).resize(function() {
 });
 
 shortcut.add("left",function() {
-    game.skier.state = 'left';
+    breh.state = 'left';
 });
 shortcut.add("right",function() {
-    game.skier.state = 'right';
+    breh.state = 'right';
 });
 
 shortcut.add("up",function() {
-    game.skier.state = 'up';
+    breh.state = 'up';
 });
 
 shortcut.add("down",function() {
-    game.skier.state = 'down';
-    game.skier.y++;
+    breh.state = 'down';
+    breh.y++;
 });
 
 $('#left').click(function(){
-    game.skier.turnLeft();
+    breh.turnLeft();
 });
 $('#right').click(function(){
-    game.skier.turnRight();
+    breh.turnRight();
 });
 
 $('.stop').click(function(){
