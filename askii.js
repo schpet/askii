@@ -412,6 +412,37 @@ function Game(){
     this.highscore = undefined;
 
     this.gameObjects = [];
+    this.stopFlag = false;
+
+    this.run = function(){
+        var self = this;
+        if(!this.stopFlag){
+        this.timeoutId = setTimeout(function(){ 
+            self.render(); 
+            self.stepForward() 
+            self.run();
+            }, this.delay);
+
+            $('.start').hide();
+            $('.stop').show();
+        } else {
+            this.stopFlag = false;
+        }
+    };
+
+    this.stop = function(){
+        if(this.timeoutId){
+            if(!clearTimeout(this.timeoutId)){
+                this.stopFlag = true;
+            }
+
+            $('.start').show();
+            $('.stop').hide();
+        } else {
+            alert("isn't running can't stop");
+        }
+
+    };
 
     this.checkCollision = function(gameObject, skier){
         if(skier == undefined){
@@ -471,16 +502,20 @@ function Game(){
             }
 
             //check for colision with skier
-            if(this.checkCollision(value))
+            if(this.checkCollision(value)){
                 this.gameObjects.splice(i, 1);
-            
-            
+                console.log("XXXX");
+                this.stop();
+                console.log("ZZZZ");
+                this.test();
+            }
         }
         
         this.skier.stepForward();
         // handle colisions
-
     };
+    this.test = function(){ alert('test'); };
+
     this.render = function(){
         this.map.clearScratchMap();
         
@@ -494,20 +529,6 @@ function Game(){
         this.map.hook.html(this.map.scratchMap.join("\n"));
     };
 
-    this.run = function(){
-        var self = this;
-        this.timeoutId = setTimeout(function(){ 
-            self.render(); 
-            self.stepForward() 
-            self.run();
-            }, this.delay);
-    };
-
-    this.stop = function(){
-        if(this.timeoutId){
-            clearTimeout(this.timeoutId);
-        }
-    };
 };
 
 
@@ -559,15 +580,11 @@ $('#right').click(function(){
 
 $('.stop').click(function(){
     game.stop();
-    $('.start').show();
-    $('.stop').hide();
 });
 
-$('.stop').hide();
 
 $('.start').click(function(){
     game.run();
-    $('.start').hide();
-    $('.stop').show();
 });
 
+$('.stop').hide();
