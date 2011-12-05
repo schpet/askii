@@ -408,6 +408,8 @@ function Game(){
     this.hook = undefined;
     this.delay = 40;
     this.timeoutId = undefined;
+    
+    this.highscore = undefined;
 
     this.gameObjects = [];
 
@@ -438,32 +440,22 @@ function Game(){
 
                 if(sx >= bl + collidable[0]
                     && sx <= bl + collidable[1]){
-                    alert("Ouch. Collision at game object row "
-                            + posY
-                            + ", column " + posX);
+                    if(this.highscore == undefined){
+                        this.highscore = this.position;
+                    }
+
+                    alert("Ouch. Your highscore is " + this.highscore 
+                            + ". Collision at game object row " + posY
+                            + ", column " + posX
+                            + ", position + " + this.position 
+                            + " (making stupid tree disappear)");
+                    return true;
+
                 }
             }
         }
-        
-        /*
-        if(skierBottom > objectTop && skierBottom < objectBottom){
-            //  bottom of skier might be touching
-            //  figure out how
 
-            var objectL = gameObject.x;
-            var objectR = gameObject.x + gameObject.width;
-            
-            if(objectL > skier.x && objectL < skier.x + skier.width){
-                alert("collision");
-            } else if(objectR > skier.x && 
-                    objectR < skier.x + skier.width){
-                alert("collision");
-            }
-        } else if(objectBottom > skierTop && objectBottom < skierBottom){
-            //
-        }
-        */
-
+        return false;
     }
 
     this.stepForward = function(){
@@ -478,15 +470,14 @@ function Game(){
                 value.stepForward();
             }
 
-
             //check for colision with skier
-            this.checkCollision(value);
+            if(this.checkCollision(value))
+                this.gameObjects.splice(i, 1);
+            
             
         }
         
         this.skier.stepForward();
-
-        
         // handle colisions
 
     };
@@ -528,8 +519,7 @@ game.skier = breh;
 game.map = new Map($('#askii'));
 game.map.init();
 
-for(var i = 15; i < 300; i++){
-    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+for(var i = 15; i < 400; i++){
     game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
     game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
     game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
