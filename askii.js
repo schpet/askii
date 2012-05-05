@@ -503,7 +503,7 @@ function Game(){
                         this.highscore = this.score;
                     }
                     
-                    $('#status').text("You've hit a tree, dang.\n Your score is " + this.score 
+                    $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score 
                         + ". Your highscore is " + this.highscore + ".");
                     $('#controls').modal('show');
                     $('.start').text("Do it again");
