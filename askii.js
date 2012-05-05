@@ -1,5 +1,11 @@
 /**
  * TODO
+ *  - Better dialogs for crashes, starting and stopping
+ *  - colors
+ *  - don't break on resize
+ *  - don't let your skier go up and down
+ *  - add speed-up objects
+ *
  *  - straighten out style w/ consistent class types
  *  - prevent whitespace from overriding bg
  *  - colisions
@@ -141,6 +147,7 @@ var Skier = GameObject.extend({
             if(self.y > 0)
                 self.y--
         };
+
         this.transformations['down'] = function(){ 
         };
 
@@ -151,6 +158,20 @@ var Skier = GameObject.extend({
         this.trackIndent['up'] = [1, 3];
         
         this.state = 'right';
+
+        console.log(shortcut);
+
+        var skier = this;
+        // TODO this adds everytime? maybe clear it out before adding
+        shortcut.add("left",function() {
+            skier.state = 'left';
+        });
+        shortcut.add("right",function() {
+            skier.state = 'right';
+        });
+        shortcut.add("down",function() {
+            skier.state = 'down';
+        });
     },
     getState: function(){
         return this.states[this.state];
@@ -265,7 +286,7 @@ function Map(hook){
             }
         }
 
-        var windowHeight = $(window).height() - $('#controls').innerHeight();
+        var windowHeight = $(window).height();
         var lineHeight = span.height();
         this.lines = Math.floor(windowHeight / lineHeight);
         span.remove();
@@ -381,8 +402,6 @@ function Map(hook){
                         modifiedLine += textLine.charAt(htmlColumn);
                     }
 
-                    
-
 
                     if(!tag){
                         textColumn++;
@@ -399,7 +418,7 @@ function Map(hook){
 
 function Game(){
     this.cameraPosition = 0;
-    this.position = 3;
+    this.position = undefined;
     this.skier = undefined;
 
     this.map = undefined;
@@ -410,24 +429,32 @@ function Game(){
     this.timeoutId = undefined;
     
     this.highscore = undefined;
+    this.score = undefined;
 
-    this.gameObjects = [];
+    this.gameObjects = undefined;
     this.stopFlag = false;
 
     this.run = function(){
         var self = this;
         if(!this.stopFlag){
-        this.timeoutId = setTimeout(function(){ 
-            self.render(); 
-            self.stepForward() 
-            self.run();
-            }, this.delay);
 
-            $('.start').hide();
-            $('.stop').show();
+            this.timeoutId = setTimeout(function(){ 
+                    self.render(); 
+                    self.stepForward() 
+                    self.run();
+                }, this.delay);
+
         } else {
             this.stopFlag = false;
         }
+    };
+
+    this.start = function(){
+        this.init();
+        $('#controls').modal('hide')
+        $('.start').hide();
+        $('.stop').show();
+        this.run();
     };
 
     this.stop = function(){
@@ -441,7 +468,6 @@ function Game(){
         } else {
             alert("isn't running can't stop");
         }
-
     };
 
     this.checkCollision = function(gameObject, skier){
@@ -471,21 +497,21 @@ function Game(){
 
                 if(sx >= bl + collidable[0]
                     && sx <= bl + collidable[1]){
-                    if(this.highscore == undefined){
-                        this.highscore = this.position;
+
+                    this.score = this.position;
+                    if(this.highscore == undefined || this.score > this.highscore){
+                        this.highscore = this.score;
                     }
+                    
+                    $('#status').text("You've hit a tree, dang.\n Your score is " + this.score 
+                        + ". Your highscore is " + this.highscore + ".");
+                    $('#controls').modal('show');
+                    $('.start').text("Do it again");
 
-                    alert("Ouch. Your highscore is " + this.highscore 
-                            + ". Collision at game object row " + posY
-                            + ", column " + posX
-                            + ", position + " + this.position 
-                            + " (making stupid tree disappear)");
                     return true;
-
                 }
             }
         }
-
         return false;
     }
 
@@ -525,46 +551,42 @@ function Game(){
         this.map.hook.html(this.map.scratchMap.join("\n"));
     };
 
+    this.init = function(){
+        this.cameraPosition = 0;
+        this.skier = new Skier(this);
+        this.trees = [];
+
+        this.position = 3;
+        this.map = new Map($(this.hook));
+        this.map.init();
+        // TODO make this less stupid
+        this.gameObjects = [];
+        for(var i = 15; i < 400; i++){
+            this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+            this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+            this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+            this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+        }
+    };
 };
 
-
-var game = new Game();
-var breh = new Skier(game);
-game.skier = breh;
-
-
-game.map = new Map($('#askii'));
-game.map.init();
-
-for(var i = 15; i < 400; i++){
-    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-    game.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+function is_touch_device() {
+  return !!('ontouchstart' in window) ? 1 : 0;
+}
+if(is_touch_device()){
+    $('.touchscreen').show();
+    $('.start').text("I realize this wont work but try it anyway");
 }
 
+var game = new Game();
+//var breh = new Skier(game);
+//game.skier = breh;
 game.hook = $('#askii');
 
 console.log(game);
 
 $(window).resize(function() {
     game.map.init();
-});
-
-shortcut.add("left",function() {
-    breh.state = 'left';
-});
-shortcut.add("right",function() {
-    breh.state = 'right';
-});
-
-shortcut.add("up",function() {
-    breh.state = 'up';
-});
-
-shortcut.add("down",function() {
-    breh.state = 'down';
-    breh.y++;
 });
 
 $('#left').click(function(){
@@ -578,9 +600,12 @@ $('.stop').click(function(){
     game.stop();
 });
 
-
 $('.start').click(function(){
-    game.run();
+    game.start();
 });
 
 $('.stop').hide();
+
+$('#controls').modal({
+  keyboard: false
+});

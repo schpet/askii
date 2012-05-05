@@ -2,121 +2,46 @@
 <html>
   <head>
     <title>ASKII</title>
-    <style type="text/css">
-      body { margin: 0px; font-family: monospace; }
-      pre { margin: 0 }
-
-      .skier { color: red; }
-      .map { 
-        font-size: 11px; 
-        line-height: 13px; 
-        font-family: monospace; 
-        /*white-space: nowrap;*/
-      }
-      #controls { 
-        bottom: 0px;
-        position: fixed;
-        background: #333;
-        width: 100%;
-        text-align: center;
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-      #controls button { 
-        height: 100px;
-        background: #00a6fc;
-        display: inline-block;
-        padding: 9px 24px 11px;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        line-height: 1;
-        position: relative;
-        cursor: pointer;
-        border: none;
-        margin: 0 4px;
-        
-
-        display: inline-block;
-        padding: 5px 15px 6px;
-        color: white !important;
-        font-size: 13px;
-        font-weight: bold;
-        line-height: 1;
-        text-decoration: none;
-        -moz-border-radius: 5px;
-        -webkit-border-radius: 5px;
-        -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-        -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        position: relative;
-        cursor: pointer;
-        overflow: visible;
-        width: auto;
-
-      }
-      .left { float: left; }
-      .right { float: right; }
-
-      @-webkit-keyframes greenPulse {
-        from { background-color: #749a02; -webkit-box-shadow:: 0 0 9px white; }
-        50% { background-color: #91bd09; -webkit-box-shadow:: 0 0 18px #91bd09; }
-        to { background-color: #749a02; -webkit-box-shadow:: 0 0 9px #333; }
-      }
-      .start {
-        -webkit-animation-name: greenPulse;
-        -webkit-animation-duration: 2s;
-        -webkit-animation-iteration-count: infinite;
-      }
-
-      #controls .keyboard { 
-        display: none;
-        color: white;
-        padding: 0 10px;
-      }
-      #controls .keyboard h2 { 
-        float:left;
-      }
-      #controls .keyboard button { 
-        float: right;
-      }
-      
-      @media only screen and (min-width: 480px) {
-        #controls button { height: 50px; }
-      }
-      @media only screen and (min-width: 1024px) {
-        #controls .mobile { display:none; }
-        #controls .keyboard { display: block; }
-      }
-
-
-    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0; user-scalable=0;">  
-
-    
+    <link rel="stylesheet"  href="style.css" />
   </head>
   <body>
-  <div id="controls">
-    <div class="mobile">
-      <button id="left" class="left">Left</button>
-      <button class="start">Start</button>
-      <button class="stop">Stop</button>
-      <button id="right" class="right">Right</button>
-    </div>
-    <div class="keyboard">
-      <h2>Use the arrow keys up, down, left and right</h2>
-      <button class="start">Start</button>
-      <button class="stop">Stop</button>
-    </div>
-  </div>
+    <div id="controls" class="modal fade">
+      <div class="modal-body">
+        <div class="keyboard">
+          <pre>
+            _____ _  _______ _____ 
+     /\    / ____| |/ /_   _|_   _|
+    /  \  | (___ | ' /  | |   | |  
+   / /\ \  \___ \|  <   | |   | |  
+  / ____ \ ____) | . \ _| |_ _| |_ 
+ /_/    \_\_____/|_|\_\_____|_____|
 
-  <div id="content">
-    <pre id="askii" class="map"></pre>
-  </div>
+ Controls: [&larr;] [&darr;] [&rarr;]
+          </pre>
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
-    <script src="shortcut.js"></script>
+          <noscript>
+            This game relies on javascript. If you enable it I promise
+            it's worth your while. 
+          </noscript>
+          <p class="touchscreen">
+            I haven't got this working on touchscreens yet, sorry :(
+          </p>
+
+          <pre class="p" id="status"></pre>
+
+          <button class="start centered">Lets Do This</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="content">
+      <pre id="askii" class="map"></pre>
+    </div>
+
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/shortcut.js"></script>
+    <script src="libs/bootstrap-modal.js"></script>
     <script src="askii.js"></script>
   </body>
 </html>
