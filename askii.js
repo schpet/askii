@@ -159,7 +159,7 @@ var Skier = GameObject.extend({
         
         this.state = 'right';
 
-        console.log(shortcut);
+        //console.log(shortcut);
 
         var skier = this;
         // TODO this adds everytime? maybe clear it out before adding
@@ -573,39 +573,28 @@ function Game(){
 function is_touch_device() {
   return !!('ontouchstart' in window) ? 1 : 0;
 }
+
 if(is_touch_device()){
     $('.touchscreen').show();
     $('.start').text("I realize this wont work but try it anyway");
 }
 
 var game = new Game();
-//var breh = new Skier(game);
-//game.skier = breh;
+
 game.hook = $('#askii');
 
-console.log(game);
-
-$(window).resize(function() {
-    game.map.init();
+$(window).resize(function(){
+  game.map.init()
 });
 
-$('#left').click(function(){
-    breh.turnLeft();
-});
-$('#right').click(function(){
-    breh.turnRight();
-});
+$('.stop').click(game.stop.bind(game));
+$('.start').click(game.start.bind(game));
 
-$('.stop').click(function(){
-    game.stop();
-});
-
-$('.start').click(function(){
-    game.start();
-});
+shortcut.add("enter", game.start.bind(game));
+shortcut.add("space", game.start.bind(game));
 
 $('.stop').hide();
 
 $('#controls').modal({
-  keyboard: false
+    keyboard: false
 });
