@@ -26,57 +26,57 @@
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
   this.Class = function(){};
-  
+
   // Create a new Class that inherits from this class
   Class.extend = function(prop) {
     var _super = this.prototype;
-    
+
     // Instantiate a base class (but only create the instance,
     // don't run the init constructor)
     initializing = true;
     var prototype = new this();
     initializing = false;
-    
+
     // Copy the properties over onto the new prototype
     for (var name in prop) {
       // Check if we're overwriting an existing function
-      prototype[name] = typeof prop[name] == "function" && 
+      prototype[name] = typeof prop[name] == "function" &&
         typeof _super[name] == "function" && fnTest.test(prop[name]) ?
         (function(name, fn){
           return function() {
             var tmp = this._super;
-            
+
             // Add a new ._super() method that is the same method
             // but on the super-class
             this._super = _super[name];
-            
+
             // The method only need to be bound temporarily, so we
             // remove it when we're done executing
-            var ret = fn.apply(this, arguments);        
+            var ret = fn.apply(this, arguments);
             this._super = tmp;
-            
+
             return ret;
           };
         })(name, prop[name]) :
         prop[name];
     }
-    
+
     // The dummy class constructor
     function Class() {
       // All construction is actually done in the init method
       if ( !initializing && this.init )
         this.init.apply(this, arguments);
     }
-    
+
     // Populate our constructed prototype object
     Class.prototype = prototype;
-    
+
     // Enforce the constructor to be what we expect
     Class.prototype.constructor = Class;
 
     // And make this class extendable
     Class.extend = arguments.callee;
-    
+
     return Class;
   };
 })();
@@ -107,7 +107,7 @@ var Skier = GameObject.extend({
 
         this.states = {
             'right': [
-                        "  O  ", 
+                        "  O  ",
                         " -|- ",
                         "  \\\\ ",
                         "   ``"
@@ -133,22 +133,22 @@ var Skier = GameObject.extend({
         };
 
         this.transformations = {};
-        this.transformations['left'] = function(){ 
+        this.transformations['left'] = function(){
             if(self.x > 0){
                 self.x--;
             }
         };
-        this.transformations['right'] = function(){ 
+        this.transformations['right'] = function(){
             if(self.x < self.world.map.maxChars){
                 self.x++;
             }
         };
-        this.transformations['up'] = function(){ 
+        this.transformations['up'] = function(){
             if(self.y > 0)
                 self.y--
         };
 
-        this.transformations['down'] = function(){ 
+        this.transformations['down'] = function(){
         };
 
         this.trackIndent = {};
@@ -156,7 +156,7 @@ var Skier = GameObject.extend({
         this.trackIndent['right'] = [1, 2];
         this.trackIndent['down'] = [1, 3];
         this.trackIndent['up'] = [1, 3];
-        
+
         this.state = 'right';
 
         //console.log(shortcut);
@@ -169,9 +169,9 @@ var Skier = GameObject.extend({
         shortcut.add("right",function() {
             skier.state = 'right';
         });
-        shortcut.add("down",function() {
-            skier.state = 'down';
-        });
+        //shortcut.add("down",function() {
+            //skier.state = 'down';
+        //});
     },
     getState: function(){
         return this.states[this.state];
@@ -203,7 +203,7 @@ var Tree = GameObject.extend({
           ^
          /|\
         //^\\
-          | 
+          |
 
         TODO: Fallen state
         */
@@ -352,7 +352,7 @@ function Map(hook){
     }
 
     /**
-     * @param 
+     * @param
      *      gameObject - a game object with some properties
      *
      */
@@ -360,8 +360,8 @@ function Map(hook){
         // skip to line
         // step over each character, not counting html tags
         // return a copy of the map with the game object added
-        
-        for(var line = gameObject.y; 
+
+        for(var line = gameObject.y;
                 line < gameObject.y + gameObject.height; line++){
 
 
@@ -375,7 +375,7 @@ function Map(hook){
                 var textColumn = 0;
 
 
-                for(var htmlColumn = 0; htmlColumn < textLine.length; 
+                for(var htmlColumn = 0; htmlColumn < textLine.length;
                         htmlColumn++){
 
                     if(textLine.charAt(htmlColumn) == "<"){
@@ -386,12 +386,12 @@ function Map(hook){
                         console.log("tag is false");
                     }
 
-                    if(textColumn >= gameObject.x && 
+                    if(textColumn >= gameObject.x &&
                             textColumn < gameObject.x + gameObject.width){
 
                         var stateX = textColumn - gameObject.x;
                         var stateY = line - gameObject.y;
-                        character = gameObject.getState()[stateY].charAt(stateX); 
+                        character = gameObject.getState()[stateY].charAt(stateX);
 
                         if(character != ' '){
                             modifiedLine += character;
@@ -427,7 +427,7 @@ function Game(){
     this.hook = undefined;
     this.delay = 40;
     this.timeoutId = undefined;
-    
+
     this.highscore = undefined;
     this.score = undefined;
 
@@ -438,9 +438,9 @@ function Game(){
         var self = this;
         if(!this.stopFlag){
 
-            this.timeoutId = setTimeout(function(){ 
-                    self.render(); 
-                    self.stepForward() 
+            this.timeoutId = setTimeout(function(){
+                    self.render();
+                    self.stepForward()
                     self.run();
                 }, this.delay);
 
@@ -489,7 +489,7 @@ function Game(){
             // vertical = yep
             if(sx >= bl && sx <= br){
                 // horizontal = yep
-                
+
                 // determine which row we're at
                 var posY = sy - bt;
                 var posX = sx - bl;
@@ -502,8 +502,8 @@ function Game(){
                     if(this.highscore == undefined || this.score > this.highscore){
                         this.highscore = this.score;
                     }
-                    
-                    $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score 
+
+                    $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score
                         + ". Your highscore is " + this.highscore + ".");
                     $('#controls').modal('show');
                     $('.start').text("Do it again");
@@ -533,14 +533,14 @@ function Game(){
                 this.stop();
             }
         }
-        
+
         this.skier.stepForward();
         // handle colisions
     };
 
     this.render = function(){
         this.map.clearScratchMap();
-        
+
         var self = this;
         $.each(this.gameObjects, function(index, gameObject){
             self.map.renderGameObject(gameObject);
