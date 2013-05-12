@@ -8,13 +8,9 @@
  *
  *  - straighten out style w/ consistent class types
  *  - prevent whitespace from overriding bg
- *  - colisions
+ *  - collisions
  *  - dinosaurs
  *  - tracks
- */
-
-/* Via http://ejohn.org/blog/simple-javascript-inheritance/
- * Because JS doesn't come with things like inheritance
  */
 
 /* Simple JavaScript Inheritance
@@ -111,25 +107,31 @@ var Skier = GameObject.extend({
             " -|- ",
             "  \\\\ ",
             "   ``"
-        ],
+      ],
       'left': [
             "  O  ",
             " -|- ",
             " //  ",
             "``   "
-        ],
+      ],
       'down': [
             "  O  ",
             " -|- ",
             " | | ",
             " ' ' "
-        ],
+      ],
       'up': [
             "  O  ",
             " -|- ",
             " \\ / ",
             "  \"  "
-        ]
+      ],
+      'fucked': [
+            "0 O 0",
+            " x0x ",
+            " \\ / ",
+            "  \"  "
+      ]
     };
 
     this.transformations = {};
@@ -142,6 +144,8 @@ var Skier = GameObject.extend({
       if(self.x < self.world.map.maxChars){
         self.x++;
       }
+    };
+    this.transformations['fucked'] = function(){
     };
 
     this.trackIndent = {};
@@ -413,7 +417,7 @@ function Game(){
   this.trees = [];
 
   this.hook = undefined;
-  this.delay = 40;
+  this.delay = 50;
   this.timeoutId = undefined;
 
   this.highscore = undefined;
@@ -424,18 +428,18 @@ function Game(){
 
   this.run = function(){
     var self = this;
-    if(!this.stopFlag){
-      this.timeoutId = setTimeout(function(){
-          self.render();
-          self.stepForward()
-          self.run();
-        }, this.delay);
-    } else {
-      this.stopFlag = false;
-    }
+    this.timeoutId = setInterval(function(){
+      self.render();
+      self.stepForward()
+      if(this.stopFlag){
+        clearTimeout(this.stopFlag);
+        this.stopFlag = false;
+      }
+    }, this.delay);
   };
 
   this.start = function(){
+    $('body').removeClass('ded');
     this.init();
     if(this.timeoutId){
       clearTimeout(this.timeoutId);
@@ -447,16 +451,16 @@ function Game(){
   };
 
   this.stop = function(){
-    if(this.timeoutId){
-      if(!clearTimeout(this.timeoutId)){
-        this.stopFlag = true;
-      }
-
-      $('.start').show();
-      $('.stop').hide();
-    } else {
-      alert("isn't running can't stop");
+    if(!this.timeoutId){
+      return
     }
+
+    if(!clearTimeout(this.timeoutId)){
+      this.stopFlag = true;
+    }
+
+    $('.start').show();
+    $('.stop').hide();
   };
 
   this.checkCollision = function(gameObject, skier){
@@ -468,7 +472,6 @@ function Game(){
 
     var sx = cp[0] + skier.x;
     var sy = cp[1] + skier.y;
-
 
     var bt = gameObject.y;
     var bb = gameObject.y + gameObject.height - 1;
@@ -484,21 +487,7 @@ function Game(){
         var posX = sx - bl;
         var collidable = gameObject.collidable[posY];
 
-        if(sx >= bl + collidable[0]
-          && sx <= bl + collidable[1]){
-
-          this.score = this.position;
-          if(this.highscore == undefined || this.score > this.highscore){
-            this.highscore = this.score;
-          }
-
-          $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score
-            + ". Your highscore is " + this.highscore + ".");
-          $('#controls').modal('show');
-          $('.start').text("Do it again");
-
-          return true;
-        }
+        return (sx >= bl + collidable[0] && sx <= bl + collidable[1])
       }
     }
     return false;
@@ -516,15 +505,33 @@ function Game(){
         value.stepForward();
       }
 
-      //check for colision with skier
+      //check for collision with skier
       if(this.checkCollision(value)){
+        this.handleCollision();
         this.gameObjects.splice(i, 1);
         this.stop();
       }
     }
 
     this.skier.stepForward();
-    // handle colisions
+    // handle collisions
+  };
+
+  this.handleCollision = function(){
+
+    this.skier.state = 'fucked';
+    this.score = this.position;
+    if(this.highscore == undefined || this.score > this.highscore){
+      this.highscore = this.score;
+    }
+    $('body').addClass('ded');
+
+    setTimeout(function() {
+      $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score
+        + ". Your highscore is " + this.highscore + ".");
+      $('#controls').modal('show');
+      $('.start').text("Do it again");
+    }.bind(this), 1000);
   };
 
   this.render = function(){
@@ -541,6 +548,7 @@ function Game(){
   };
 
   this.init = function(){
+    var i, j;
     this.cameraPosition = 0;
     this.skier = new Skier(this);
     this.trees = [];
@@ -548,13 +556,13 @@ function Game(){
     this.position = 3;
     this.map = new Map($(this.hook));
     this.map.init();
-    // TODO make this less stupid
     this.gameObjects = [];
-    for(var i = 15; i < 400; i++){
-      this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-      this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-      this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
-      this.gameObjects.push(new Tree(Math.floor(Math.random() * game.map.maxChars), i * 4));
+    var treesPerLine = Math.max(window.innerWidth / 250);
+    for(i = 15; i < 400; i++){
+      for(j = 0; j < treesPerLine; j++) {
+        var tree = new Tree(Math.floor(Math.random() * this.map.maxChars), i * 4);
+        this.gameObjects.push(tree);
+      }
     }
   };
 };
@@ -568,22 +576,27 @@ if(is_touch_device()){
   $('.start').text("I realize this wont work but try it anyway");
 }
 
-var game = new Game();
+$(document).ready(function(){
 
-game.hook = $('#askii');
+  var game = new Game();
+  game.hook = $('#askii');
 
-$(window).resize(function(){
-  game.map.init()
-});
+  $(window).resize(function(){
+    if (game.map){
+      game.map.init()
+    }
+  });
 
-$('.stop').click(game.stop.bind(game));
-$('.start').click(game.start.bind(game));
+  $('.stop').click(game.stop.bind(game));
+  $('.start').click(game.start.bind(game));
 
-shortcut.add("enter", game.start.bind(game));
-shortcut.add("space", game.start.bind(game));
+  shortcut.add("enter", game.start.bind(game));
+  shortcut.add("space", game.start.bind(game));
 
-$('.stop').hide();
+  $('.stop').hide();
 
-$('#controls').modal({
-  keyboard: false
+  $('#controls').modal({
+    keyboard: false,
+    backdrop: false
+  });
 });

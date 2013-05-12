@@ -1,15 +1,15 @@
-body { margin: 0px; font-family: monospace; }
-pre { margin: 0 }
+pre, body { margin: 0 }
+* { font-family: monospace; }
 
 .skier { color: red; }
-.map { 
-    font-size: 11px; 
-    line-height: 13px; 
-    font-family: monospace; 
+.map {
+    font-size: 11px;
+    line-height: 13px;
+    font-family: monospace;
     /*white-space: nowrap;*/
 }
 /*
-#controls { 
+#controls {
     bottom: 0px;
     position: fixed;
     background: #333;
@@ -19,7 +19,7 @@ pre { margin: 0 }
     padding-bottom: 10px;
 }
 */
-.centered { 
+.centered {
     margin: 0 auto;
 }
 .modal {
@@ -28,7 +28,7 @@ pre { margin: 0 }
 .touchscreen {
     display: none;
 }
-#controls button { 
+button {
     height: 100px;
     background: #00a6fc;
     display: inline-block;
@@ -81,15 +81,15 @@ pre { margin: 0 }
 }
 
 /*
-#controls .keyboard { 
+#controls .keyboard {
     display: none;
     color: white;
     padding: 0 10px;
 }
-#controls .keyboard h2 { 
+#controls .keyboard h2 {
     float:left;
 }
-#controls .keyboard button { 
+#controls .keyboard button {
     float: right;
 }
 */
@@ -103,42 +103,6 @@ pre { margin: 0 }
 }
 
 /* From Twitter bootstrap (getbootstrap.com) MIT Licensed */
-.modal-open .dropdown-menu {
-  z-index: 2050;
-}
-
-.modal-open .dropdown.open {
-  *z-index: 2050;
-}
-
-.modal-open .popover {
-  z-index: 2060;
-}
-
-.modal-open .tooltip {
-  z-index: 2070;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1040;
-  background-color: #000000;
-}
-
-.modal-backdrop.fade {
-  opacity: 0;
-}
-
-.modal-backdrop,
-.modal-backdrop.fade.in {
-  opacity: 0.8;
-  filter: alpha(opacity=80);
-}
-
 .modal {
   position: fixed;
   top: 50%;
@@ -151,12 +115,9 @@ pre { margin: 0 }
   border: 1px solid #999;
   border: 1px solid rgba(0, 0, 0, 0.3);
   *border: 1px solid #999;
-  -webkit-border-radius: 6px;
-     -moz-border-radius: 6px;
-          border-radius: 6px;
-  -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-     -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-          box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 10px 10px 0 rgba(0, 0, 0, 1.0);
+     -moz-box-shadow: 10px 10px 0 rgba(0, 0, 0, 1.0);
+          box-shadow: 10px 10px 0 rgba(0, 0, 0, 1.0);
   -webkit-background-clip: padding-box;
      -moz-background-clip: padding-box;
           background-clip: padding-box;
@@ -164,11 +125,11 @@ pre { margin: 0 }
 
 .modal.fade {
   top: -25%;
-  -webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
-     -moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-      -ms-transition: opacity 0.3s linear, top 0.3s ease-out;
-       -o-transition: opacity 0.3s linear, top 0.3s ease-out;
-          transition: opacity 0.3s linear, top 0.3s ease-out;
+  -webkit-transition: opacity 0.3s linear, top 0.6s ease-out;
+     -moz-transition: opacity 0.3s linear, top 0.6s ease-out;
+      -ms-transition: opacity 0.3s linear, top 0.6s ease-out;
+       -o-transition: opacity 0.3s linear, top 0.6s ease-out;
+          transition: opacity 0.3s linear, top 0.6s ease-out;
 }
 
 .modal.fade.in {
@@ -226,4 +187,15 @@ pre { margin: 0 }
 
 .modal-footer .btn-group .btn + .btn {
   margin-left: -1px;
+}
+
+body {
+  -webkit-transition: background 2000ms;
+  -moz-transition: background 2000ms;
+  -ms-transition: background 2000ms;
+  transition: background 2000ms;
+  background: rgba(255,255, 255, 1);
+}
+.ded {
+  background: rgba(255,0,0, 0.7);
 }
