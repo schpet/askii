@@ -8,6 +8,16 @@ pre, body { margin: 0 }
     font-family: monospace;
     /*white-space: nowrap;*/
 }
+.big {
+  font-size: 69px;
+}
+.live-score {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+}
 /*
 #controls {
     bottom: 0px;

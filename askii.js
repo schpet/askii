@@ -247,8 +247,7 @@ function Map(hook){
 
     var visible  = "";
     for(var i = 0; i < this.lines; i++){
-      // var s = this.getRandomLine();
-      var s = this.getBlankLine();
+      var s = this.getBlankLine(this.maxChars);
       this.map.push(s);
       visible  += s + "\n";
     }
@@ -291,22 +290,9 @@ function Map(hook){
     this.offset++;
   }
 
-  this.getRandomLine = function(){
+  this.getBlankLine = function(maxChars){
     var s = '';
-    for(var i = 0; i < this.maxChars; i++){
-      var rand = Math.random();
-
-      if(rand < 0.995){
-        s += ' '
-      } else {
-        s += '#'
-      }
-    }
-    return s;
-  }
-  this.getBlankLine = function(){
-    var s = '';
-    for(var i = 0; i < this.maxChars; i++){
+    for(var i = 0; i < maxChars; i++){
        s += ' ';
     }
     return s;
@@ -408,7 +394,7 @@ function Map(hook){
 
 }
 
-function Game(){
+function Game($hook, $score){
   this.cameraPosition = 0;
   this.position = undefined;
   this.skier = undefined;
@@ -416,7 +402,8 @@ function Game(){
   this.map = undefined;
   this.trees = [];
 
-  this.hook = undefined;
+  this.$hook = $hook;
+  this.$score = $score;
   this.delay = 50;
   this.timeoutId = undefined;
 
@@ -439,6 +426,10 @@ function Game(){
   };
 
   this.start = function(){
+    if (this.modalTimeout) {
+      clearTimeout(this.modalTimeout)
+      this.modalTimeout = null;
+    }
     $('body').removeClass('ded');
     this.init();
     if(this.timeoutId){
@@ -526,11 +517,12 @@ function Game(){
     }
     $('body').addClass('ded');
 
-    setTimeout(function() {
-      $('#status').text("You've hit a tree, dang.\n\n Your score is " + this.score
-        + ". Your highscore is " + this.highscore + ".");
+    this.modalTimeout = setTimeout(function() {
+      $('#score').text(this.score + "!!!!");
+      $('#status').text("Your highscore is " + this.highscore + ".");
       $('#controls').modal('show');
       $('.start').text("Do it again");
+      this.modalTimeout = null;
     }.bind(this), 1000);
   };
 
@@ -545,6 +537,7 @@ function Game(){
     this.map.renderGameObject(this.skier);
 
     this.map.hook.html(this.map.scratchMap.join("\n"));
+    this.$score.text(this.position + 1);
   };
 
   this.init = function(){
@@ -554,16 +547,25 @@ function Game(){
     this.trees = [];
 
     this.position = 3;
-    this.map = new Map($(this.hook));
+    this.map = new Map(this.$hook);
     this.map.init();
     this.gameObjects = [];
-    var treesPerLine = Math.max(window.innerWidth / 250);
-    for(i = 15; i < 400; i++){
-      for(j = 0; j < treesPerLine; j++) {
+
+    var treesPerLine = [
+      Math.max(window.innerWidth / 500),
+      Math.max(window.innerWidth / 250),
+      Math.max(window.innerWidth / 125),
+      Math.max(window.innerWidth / 75),
+    ]
+
+    totalLength = treesPerLine.length * 100;
+    for(i = 15; i < totalLength; i++){
+      for(j = 0; j < treesPerLine[Math.floor(i / (totalLength / 3))]; j++) {
         var tree = new Tree(Math.floor(Math.random() * this.map.maxChars), i * 4);
         this.gameObjects.push(tree);
       }
     }
+
   };
 };
 
@@ -578,8 +580,7 @@ if(is_touch_device()){
 
 $(document).ready(function(){
 
-  var game = new Game();
-  game.hook = $('#askii');
+  var game = new Game($('#askii'), $('#live-score'));
 
   $(window).resize(function(){
     if (game.map){
