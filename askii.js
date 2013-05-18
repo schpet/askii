@@ -426,11 +426,12 @@ function Game($hook, $score){
   };
 
   this.start = function(){
+    $('body').attr('class', 'state-start')
     if (this.modalTimeout) {
       clearTimeout(this.modalTimeout)
       this.modalTimeout = null;
     }
-    $('body').removeClass('ded');
+    $('body').removeClass('state-ded');
     this.init();
     if(this.timeoutId){
       clearTimeout(this.timeoutId);
@@ -485,6 +486,8 @@ function Game($hook, $score){
   }
 
   this.stepForward = function(){
+    var i;
+
     this.position++;
     this.map.stepForward();
 
@@ -505,6 +508,12 @@ function Game($hook, $score){
     }
 
     this.skier.stepForward();
+
+    for (i = 0; i < this.difficulty.length; i++){
+      if (this.position === this.difficulty[i].start){
+        $('body').attr('class', 'state-' + this.difficulty[i].name)
+      }
+    }
     // handle collisions
   };
 
@@ -515,13 +524,13 @@ function Game($hook, $score){
     if(this.highscore == undefined || this.score > this.highscore){
       this.highscore = this.score;
     }
-    $('body').addClass('ded');
+    $('body').attr('class', 'state-ded');
 
     this.modalTimeout = setTimeout(function() {
       $('#score').text(this.score + "!!!!");
       $('#status').text("Your highscore is " + this.highscore + ".");
       $('#controls').modal('show');
-      $('.start').text("Do it again");
+      $('.state-start').text("Do it again");
       this.modalTimeout = null;
     }.bind(this), 1000);
   };
@@ -551,17 +560,19 @@ function Game($hook, $score){
     this.map.init();
     this.gameObjects = [];
 
-    var treesPerLine = [
-      Math.max(window.innerWidth / 500),
-      Math.max(window.innerWidth / 250),
-      Math.max(window.innerWidth / 125),
-      Math.max(window.innerWidth / 75),
+    var levelLength = 100;
+    var treeHeight = 4;
+    this.difficulty = [
+      { name: 'easy', start:  levelLength * treeHeight * 0, treesPerLine: Math.max(window.innerWidth / 500) },
+      { name: 'medium', start: levelLength * treeHeight * 1, treesPerLine: Math.max(window.innerWidth / 250) },
+      { name: 'hard', start: levelLength * treeHeight * 2, treesPerLine: Math.max(window.innerWidth / 125) },
     ]
 
-    totalLength = treesPerLine.length * 100;
+    totalLength = this.difficulty.length * levelLength;
+
     for(i = 15; i < totalLength; i++){
-      for(j = 0; j < treesPerLine[Math.floor(i / (totalLength / 3))]; j++) {
-        var tree = new Tree(Math.floor(Math.random() * this.map.maxChars), i * 4);
+      for(j = 0; j < this.difficulty[Math.floor(i / (totalLength / 3))].treesPerLine; j++) {
+        var tree = new Tree(Math.floor(Math.random() * this.map.maxChars), i * treeHeight);
         this.gameObjects.push(tree);
       }
     }
